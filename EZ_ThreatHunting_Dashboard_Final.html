@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Egon Zehnder Threat Hunting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#C8102E;--dark:#1a1a1a;--bg:#f5f4f2;--bg2:#eeecea;--white:#fff;
+  --t1:#111110;--t2:#4e4d4a;--t3:#8a8880;
+  --border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.15);
+  --sans:'Inter',system-ui,sans-serif;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100vh}
+
+/* HEADER */
+.hdr{background:#fff;border-bottom:2.5px solid var(--red);padding:0 2.5rem;height:68px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;gap:1rem;flex-wrap:wrap;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.hdr-left{display:flex;align-items:center;gap:18px}
+.ez-logo-img{height:30px;width:auto;display:block}
+.hdr-divider{width:1px;height:34px;background:var(--border2)}
+.hdr-dept{font-size:11px;color:var(--red);letter-spacing:0.09em;text-transform:uppercase;font-weight:500;white-space:nowrap}
+.hdr-right{font-size:11px;color:var(--t3);letter-spacing:.03em;text-align:right;line-height:1.6}
+.hdr-right strong{display:block;color:var(--t1);font-weight:500;font-size:12px}
+
+/* HERO */
+.hero{background:var(--dark);padding:3rem 2.5rem 2.5rem;border-bottom:3px solid var(--red)}
+.hero-eye{font-size:10.5px;color:var(--red);text-transform:uppercase;letter-spacing:0.13em;margin-bottom:.65rem;font-weight:500}
+.hero-title{font-size:32px;font-weight:300;color:#fff;line-height:1.2;max-width:620px;margin-bottom:.85rem;letter-spacing:-.01em}
+.hero-sub{font-size:13.5px;color:#6f6f6f;max-width:600px;line-height:1.75}
+
+/* KPI BAR */
+.kpi-bar{background:#fff;border-bottom:.5px solid var(--border);padding:1.35rem 2.5rem;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:0}
+.kpi{padding:.25rem 1.5rem .25rem 0;border-right:.5px solid var(--border)}
+.kpi:last-child{border-right:none}
+.kpi-n{font-size:32px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.02em}
+.kpi-n.r{color:var(--red)}.kpi-n.a{color:#92600a}.kpi-n.g{color:#2a5c10}
+.kpi-l{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-top:6px}
+
+/* TABS */
+.tab-bar{background:#fff;border-bottom:.5px solid var(--border);padding:0 2.5rem;
+  display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:68px;z-index:90}
+.tab-bar::-webkit-scrollbar{height:2px}
+.tab-btn{font-size:12.5px;padding:1.1rem 1.5rem;border:none;background:none;cursor:pointer;
+  color:var(--t3);font-family:var(--sans);white-space:nowrap;letter-spacing:.02em;
+  border-bottom:2.5px solid transparent;margin-bottom:-0.5px;transition:all .15s;font-weight:400}
+.tab-btn:hover{color:var(--t1)}
+.tab-btn.active{color:var(--red);border-bottom-color:var(--red);font-weight:500}
+
+/* PANELS */
+.panel{display:none;padding:2rem 2.5rem 3rem;animation:fadeIn .2s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTION */
+.sec-title{font-size:20px;font-weight:300;color:var(--t1);margin-bottom:.25rem;letter-spacing:-.01em}
+.sec-sub{font-size:12.5px;color:var(--t3);margin-bottom:1.75rem;line-height:1.6}
+
+/* STAT STRIP */
+.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:1rem;margin-bottom:1.75rem}
+.stat-tile{background:#fff;border:.5px solid var(--border);border-radius:2px;padding:1.1rem 1.25rem;
+  display:flex;align-items:center;gap:.9rem;border-left:3px solid var(--border)}
+.stat-tile.red{border-left-color:var(--red)}.stat-tile.amber{border-left-color:#c47b10}
+.stat-tile.green{border-left-color:#2a5c10}.stat-tile.blue{border-left-color:#185FA5}
+.stat-icon{font-size:24px;line-height:1;flex-shrink:0}
+.stat-val{font-size:24px;font-weight:300;line-height:1;letter-spacing:-.01em}
+.stat-lbl{font-size:10.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+
+/* CHARTS GRID */
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem;margin-bottom:1.75rem}
+.chart-card{background:#fff;border:.5px solid var(--border);border-radius:2px;padding:1.35rem}
+.chart-card.wide{grid-column:1/-1}
+.chart-card.half2{grid-column:span 2}
+.chart-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--red);font-weight:500;margin-bottom:3px}
+.chart-sub{font-size:11.5px;color:var(--t3);margin-bottom:1.1rem}
+.chart-wrap canvas{max-height:230px}
+.chart-wrap.tall canvas{max-height:290px}
+
+/* FILTER */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1.35rem}
+.filter-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-right:4px}
+.fbtn{font-size:11.5px;padding:5px 16px;border:.5px solid var(--border2);
+  background:transparent;color:var(--t2);cursor:pointer;border-radius:2px;
+  transition:all .15s;font-family:var(--sans)}
+.fbtn:hover,.fbtn.active{background:var(--red);border-color:var(--red);color:#fff}
+
+/* HUNT GRID */
+.hunt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1rem}
+
+/* CARD */
+.card{background:#fff;border:.5px solid var(--border);border-top:3px solid var(--border);
+  border-radius:2px;display:flex;flex-direction:column;cursor:pointer;
+  transition:box-shadow .2s,transform .15s}
+.card:hover{box-shadow:0 8px 28px rgba(0,0,0,.11);transform:translateY(-2px)}
+.card.h{border-top-color:var(--red)}.card.m{border-top-color:#c47b10}
+.card.l{border-top-color:#2a5c10}.card.i{border-top-color:#185FA5}
+.card-head{padding:.95rem 1.25rem .8rem;border-bottom:.5px solid var(--border)}
+.card-meta{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem;gap:6px;flex-wrap:wrap}
+.sbadge{font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:3px 9px;border-radius:2px;white-space:nowrap}
+.sdone{background:#eaf3de;color:#224009}.swip{background:#faeeda;color:#5a3205}
+.rpill{font-size:10px;padding:3px 9px;border-radius:2px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.rh{background:#fcebeb;color:#6b1515}.rm{background:#faeeda;color:#5a3205}
+.rl{background:#eaf3de;color:#224009}.ri{background:#e6f1fb;color:#0c447c}
+.card-title{font-size:14.5px;font-weight:500;color:var(--t1);line-height:1.35;margin-bottom:4px}
+.card-owner{font-size:11px;color:var(--t3)}
+.card-body{padding:.875rem 1.25rem;flex:1}
+.slbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--red);margin-bottom:3px;font-weight:500}
+.card-hyp{font-size:12.5px;color:var(--t2);line-height:1.6;margin-bottom:.8rem}
+.mtags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.8rem}
+.mtag{font-size:10px;padding:2px 7px;background:#e6f1fb;color:#0c447c;border-radius:2px;font-family:'Courier New',monospace}
+.impact-line{display:flex;align-items:flex-start;gap:7px}
+.impact-txt{font-size:12px;color:var(--t2);line-height:1.5}
+.card-foot{padding:.6rem 1.25rem;border-top:.5px solid var(--border);background:var(--bg2);
+  display:flex;justify-content:space-between;align-items:center}
+.cdate{font-size:11px;color:var(--t3)}
+.vbtn{font-size:11px;color:var(--red);border:none;background:none;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:3px}
+.vbtn:hover{text-decoration:underline}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:1.75rem;max-width:760px}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--red),var(--border2))}
+.tl-item{position:relative;margin-bottom:1.75rem;padding-left:1.25rem}
+.tl-dot{position:absolute;left:-1.875rem;top:5px;width:11px;height:11px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px var(--border2)}
+.tl-dot.h{background:var(--red)}.tl-dot.m{background:#c47b10}.tl-dot.l{background:#2a5c10}.tl-dot.i{background:#185FA5}
+.tl-date{font-size:10.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.tl-title{font-size:14px;font-weight:500;color:var(--t1);margin-bottom:3px}
+.tl-meta{font-size:11px;color:var(--t3);margin-bottom:5px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tl-desc{font-size:12.5px;color:var(--t2);line-height:1.65}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;
+  overflow-y:auto;padding:2rem 1rem;align-items:flex-start;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:#fff;width:100%;max-width:760px;border-radius:2px;overflow:hidden;margin:auto;animation:slideUp .2s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.modal-hdr{background:var(--dark);padding:1.5rem 1.75rem;border-bottom:3px solid var(--red);
+  display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.modal-title{font-size:20px;font-weight:300;color:#fff;line-height:1.3}
+.modal-close{background:none;border:none;color:#777;cursor:pointer;font-size:26px;padding:0;line-height:1;flex-shrink:0;transition:color .15s}
+.modal-close:hover{color:#fff}
+.modal-body{padding:1.5rem 1.75rem}
+.d-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem}
+.dlbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--red);margin-bottom:5px;font-weight:500}
+.dval{font-size:13px;color:var(--t1);line-height:1.55}
+.dval.m{color:var(--t2)}
+.divider{height:.5px;background:var(--border);margin:1.25rem 0}
+.fbox{background:var(--bg2);border-left:3px solid var(--red);padding:1rem 1.15rem;margin-bottom:1.25rem;border-radius:0 2px 2px 0}
+.fbox .blbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--red);margin-bottom:6px;font-weight:500}
+.fbox p{font-size:12.5px;color:var(--t2);line-height:1.75}
+.tp-grid{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;margin-bottom:1.25rem}
+.tbox{border-radius:2px;padding:.9rem 1rem}
+.tbox.tst{background:#fcebeb;border-left:3px solid var(--red)}
+.tbox.prd{background:#eaf3de;border-left:3px solid #2a5c10}
+.tbox .blbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px;font-weight:500}
+.tbox.tst .blbl{color:#6b1515}.tbox.prd .blbl{color:#224009}
+.tbox p{font-size:12px;line-height:1.65}
+.tbox.tst p{color:#6b1515}.tbox.prd p{color:#224009}
+.rlist{list-style:none;margin-bottom:1.25rem}
+.rlist li{font-size:12.5px;color:var(--t2);line-height:1.6;padding:5px 0 5px 18px;position:relative;border-bottom:.5px solid var(--border)}
+.rlist li:last-child{border-bottom:none}
+.rlist li::before{content:'—';position:absolute;left:0;color:var(--red);font-weight:700}
+.abox{background:var(--bg2);border-left:3px solid #185FA5;padding:1rem 1.15rem;border-radius:0 2px 2px 0}
+.abox .blbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:#185FA5;margin-bottom:6px;font-weight:500}
+.abox p{font-size:12.5px;color:var(--t2);line-height:1.75}
+.dc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1.25rem}
+.dctag{font-size:10px;padding:2px 7px;background:var(--bg2);border:.5px solid var(--border2);color:var(--t2);border-radius:2px;font-family:'Courier New',monospace}
+
+/* MITRE TABLE */
+.mitre-table-wrap{background:#fff;border:.5px solid var(--border);border-radius:2px;overflow:hidden;overflow-x:auto}
+.mitre-table-wrap table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
+.mitre-table-wrap th{text-align:left;padding:.75rem 1.25rem;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--red);font-weight:500;background:#f5f4f2;border-bottom:.5px solid var(--border2)}
+.mitre-table-wrap td{padding:.65rem 1.25rem;border-bottom:.5px solid rgba(0,0,0,.055);color:var(--t2)}
+.mitre-table-wrap tr:last-child td{border-bottom:none}
+.mitre-table-wrap tr:nth-child(even) td{background:#fafaf9}
+
+/* FOOTER */
+.footer{background:var(--dark);padding:1.5rem 2.5rem;text-align:center;border-top:2px solid var(--red)}
+.footer p{font-size:11px;color:#444;letter-spacing:.03em}
+.footer strong{color:#666;font-weight:500}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hdr{padding:.875rem 1.25rem;height:auto}.tab-bar{padding:0 1rem;top:0;position:relative}
+  .hero{padding:2rem 1.25rem}.kpi-bar{padding:1rem 1.25rem}
+  .panel{padding:1.25rem 1rem 2.5rem}
+  .hunt-grid{grid-template-columns:1fr}.charts-grid{grid-template-columns:1fr}
+  .d-grid{grid-template-columns:1fr}.tp-grid{grid-template-columns:1fr}
+  .modal-body{padding:1.25rem}.chart-card.half2{grid-column:auto}
+  .kpi-n{font-size:26px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER with real EZ logo -->
+<header class="hdr">
+  <div class="hdr-left">
+    <img class="ez-logo-img"
+      src="https://www.egonzehnder.com/assets/svg/ez-logo-red.svg"
+      alt="Egon Zehnder"
+      onerror="this.outerHTML='<div style=\'display:flex;align-items:center;gap:10px\'><div style=\'width:38px;height:38px;background:#C8102E;display:flex;align-items:center;justify-content:center\'><span style=\'color:#fff;font-weight:700;font-size:13px;letter-spacing:.5px\'>EZ</span></div><span style=\'font-size:15px;font-weight:500;color:#111110\'>Egon Zehnder</span></div>'">
+    <div class="hdr-divider"></div>
+    <div class="hdr-dept">Security Operations &nbsp;&middot;&nbsp; Threat Hunting</div>
+  </div>
+  <div class="hdr-right">
+    <strong>Threat Intelligence Dashboard</strong>
+    Confidential &nbsp;&middot;&nbsp; June 2026
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eye">SOC Threat Hunting Program</div>
+  <div class="hero-title">Proactive Security Assurance Dashboard</div>
+  <div class="hero-sub">A structured record of adversarial simulations, hypothesis-driven threat hunts, and detection engineering conducted by the EZ SOC team — covering endpoint, identity, network, and physical security domains.</div>
+</div>
+
+<!-- KPI BAR -->
+<div class="kpi-bar">
+  <div class="kpi"><div class="kpi-n">12</div><div class="kpi-l">Total Hunts</div></div>
+  <div class="kpi"><div class="kpi-n g">9</div><div class="kpi-l">Completed</div></div>
+  <div class="kpi"><div class="kpi-n a">3</div><div class="kpi-l">In Progress</div></div>
+  <div class="kpi"><div class="kpi-n r">4</div><div class="kpi-l">High Risk Findings</div></div>
+  <div class="kpi"><div class="kpi-n r">3</div><div class="kpi-l">Exposures Confirmed</div></div>
+  <div class="kpi"><div class="kpi-n">2</div><div class="kpi-l">Open CS Cases</div></div>
+  <div class="kpi"><div class="kpi-n" style="font-size:13px;line-height:1.65;padding-top:5px">Shresth<br>Abhinav</div><div class="kpi-l">Lead Hunters</div></div>
+</div>
+
+<!-- TAB BAR -->
+<nav class="tab-bar" role="tablist" aria-label="Dashboard sections">
+  <button class="tab-btn active" onclick="showTab('overview',this)" role="tab" aria-selected="true">Overview &amp; Analytics</button>
+  <button class="tab-btn" onclick="showTab('hunts',this)" role="tab" aria-selected="false">All Hunt Activities</button>
+  <button class="tab-btn" onclick="showTab('timeline',this)" role="tab" aria-selected="false">Timeline</button>
+  <button class="tab-btn" onclick="showTab('mitre',this)" role="tab" aria-selected="false">MITRE ATT&amp;CK Coverage</button>
+</nav>
+
+<!-- ══ PANEL: OVERVIEW ══ -->
+<div id="panel-overview" class="panel active">
+  <div class="sec-title">Security Posture at a Glance</div>
+  <div class="sec-sub">Aggregated metrics and visual analytics across all threat hunting activities conducted by the EZ SOC team.</div>
+
+  <div class="stat-strip">
+    <div class="stat-tile red">
+      <div class="stat-icon">⚠️</div>
+      <div><div class="stat-val" style="color:var(--red)">3</div><div class="stat-lbl">Exposures Confirmed</div></div>
+    </div>
+    <div class="stat-tile green">
+      <div class="stat-icon">🛡️</div>
+      <div><div class="stat-val" style="color:#2a5c10">6</div><div class="stat-lbl">Controls Validated</div></div>
+    </div>
+    <div class="stat-tile amber">
+      <div class="stat-icon">🔔</div>
+      <div><div class="stat-val" style="color:#92600a">8</div><div class="stat-lbl">SIEM Rules Created</div></div>
+    </div>
+    <div class="stat-tile blue">
+      <div class="stat-icon">📋</div>
+      <div><div class="stat-val" style="color:#185FA5">2</div><div class="stat-lbl">Open CS Support Cases</div></div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Risk Distribution</div>
+      <div class="chart-sub">Hunt activities by risk level</div>
+      <div class="chart-wrap"><canvas id="cRisk"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Hunt Status</div>
+      <div class="chart-sub">Completed vs in-progress</div>
+      <div class="chart-wrap"><canvas id="cStatus"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Exposure Impact</div>
+      <div class="chart-sub">Was the environment impacted?</div>
+      <div class="chart-wrap"><canvas id="cImpact"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Detection Actions Taken</div>
+      <div class="chart-sub">Outcome category per hunt</div>
+      <div class="chart-wrap"><canvas id="cDetection"></canvas></div>
+    </div>
+    <div class="chart-card wide">
+      <div class="chart-title">Hunt Activity Timeline — Risk Breakdown</div>
+      <div class="chart-sub">All hunts mapped chronologically by risk level (2025–2026)</div>
+      <div class="chart-wrap tall"><canvas id="cTimeline"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Exposure Area Coverage</div>
+      <div class="chart-sub">Systems & layers targeted across all hunts</div>
+      <div class="chart-wrap"><canvas id="cArea"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Hunt Ownership</div>
+      <div class="chart-sub">Hunts led per team member</div>
+      <div class="chart-wrap"><canvas id="cOwner"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PANEL: HUNTS ══ -->
+<div id="panel-hunts" class="panel">
+  <div class="sec-title">All Threat Hunt Activities</div>
+  <div class="sec-sub">Click any card to view the full hypothesis, findings, remediation steps, and next actions.</div>
+  <div class="filter-row">
+    <span class="filter-lbl">Filter:</span>
+    <button class="fbtn active" onclick="filterCards('all',this)">All (12)</button>
+    <button class="fbtn" onclick="filterCards('high',this)">High Risk</button>
+    <button class="fbtn" onclick="filterCards('medium',this)">Medium Risk</button>
+    <button class="fbtn" onclick="filterCards('low',this)">Low / Info</button>
+    <button class="fbtn" onclick="filterCards('wip',this)">In Progress</button>
+    <button class="fbtn" onclick="filterCards('exposed',this)">⚠ Exposed</button>
+  </div>
+  <div class="hunt-grid" id="card-grid"></div>
+</div>
+
+<!-- ══ PANEL: TIMELINE ══ -->
+<div id="panel-timeline" class="panel">
+  <div class="sec-title">Chronological Hunt Timeline</div>
+  <div class="sec-sub">All threat hunting activities ordered from earliest to most recent.</div>
+  <div class="timeline" id="tl-container"></div>
+</div>
+
+<!-- ══ PANEL: MITRE ══ -->
+<div id="panel-mitre" class="panel">
+  <div class="sec-title">MITRE ATT&amp;CK Coverage Map</div>
+  <div class="sec-sub">Techniques and tactics exercised across all 12 threat hunting activities. Colour-coded by category.</div>
+  <div class="charts-grid">
+    <div class="chart-card wide">
+      <div class="chart-title">ATT&amp;CK Technique Frequency</div>
+      <div class="chart-sub">Number of hunt activities mapped to each technique or tactic</div>
+      <div class="chart-wrap tall"><canvas id="cMitre"></canvas></div>
+    </div>
+  </div>
+  <div class="mitre-table-wrap" id="mitre-table"></div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal-inner">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-title"></div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p><strong>Egon Zehnder &mdash; Security Operations Center</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Threat Hunting Dashboard&nbsp;&nbsp;|&nbsp;&nbsp;Confidential &amp; Internal Use Only&nbsp;&nbsp;|&nbsp;&nbsp;2025–2026</p>
+</footer>
+
+<script>
+/* ════════════════════════════════
+   DATA
+════════════════════════════════ */
+const hunts=[
+{id:1,title:"Scheduled Job Abuse",status:"done",risk:"medium",owner:"Shresth Paul",
+ dates:"16 Feb – 23 Feb 2026",sortDate:"2026-02-16",
+ dc:["DC0001","DC0012","DC0005"],mitre:["T1053","TA0003"],
+ hypothesis:"Attackers persist via scheduled tasks using LOLBins, encoded commands, and suspicious paths to evade detection and maintain long-term access on compromised endpoints.",
+ exposure:"Windows Endpoints — Scheduled Task Mechanism",
+ finding:"Visibility achieved via CrowdStrike NG-SIEM. Rules successfully detected suspicious task creation, task masquerading, rapid task creation, privilege escalation attempts, encoded command execution, task replication behaviour, and temporary path execution. However, rules produced significant alert noise and were temporarily disabled pending fine-tuning.",
+ testFinding:null,prodFinding:null,
+ risks:[],impacted:false,
+ action:"Created multiple NG-SIEM rules. LOLBin Execution & Modification rule updated. Fine-tuning ongoing to reduce alert fatigue while retaining detection fidelity.",
+ next:"Fine-tune existing rules and build additional detections around scheduled task abuse patterns.",
+ tools:"CrowdStrike NG-SIEM"},
+
+{id:2,title:"EDR-Freeze (EDR Suspension Attack)",status:"done",risk:"high",owner:"Abhinav Tiwari",
+ dates:"25 Sep 2025 (Test) · 26 Sep 2025 (Prod)",sortDate:"2025-09-25",
+ dc:[],mitre:["T1562.001","T1548","TA0005"],
+ hypothesis:"A new PoC tool — EDR-Freeze — can temporarily suspend endpoint security processes (EDR/antivirus) from user-mode without installing drivers, exploiting legitimate Windows thread-suspension APIs. The suspended state can theoretically be prolonged indefinitely, creating a detection blind window for attacker activity.",
+ exposure:"Windows Endpoints — EDR, DLP, and All Security Services",
+ finding:"Dual-environment testing revealed a critical detection gap in the test environment but effective PPL hardening in production. Test environment: CrowdStrike's own core process was suspended with zero alerts. Production: PPL controls blocked all bypass attempts and triggered a high-severity alert.",
+ testFinding:"CRITICAL — EDR-Freeze successfully suspended lsass.exe for 5,000ms and CrowdStrike's own CSFalconServices.exe for 10,000ms with zero alerts triggered by CrowdStrike. Any process can be frozen for a desired duration without detection. Purview DLP (MPdlpservices.exe) is expected to be equally vulnerable in test environments.",
+ prodFinding:"PROTECTED — PPL (Protected Process Light) hardening prevented EDR-Freeze from suspending CrowdStrike services. PPLKiller bypass also failed: 'Unable to obtain a handle to the device object'. CrowdStrike triggered a high-severity alert when the PPL bypass was attempted. Production environment is secure.",
+ risks:[
+   "Freezes entire EDR detection for a defined time window — infrastructure becomes fully vulnerable to undetected attacker activity",
+   "Can freeze Purview DLP services (MPdlpservices.exe), causing total loss of data loss prevention visibility — a critical data security risk",
+   "Suspends legitimate system processes, impacting endpoint performance and user experience",
+   "Operates without kernel drivers from user-mode — significantly harder to detect with standard controls",
+   "Requires admin CMD prompt — WKS account privileges are the gating requirement for production exploitation"
+ ],
+ impacted:true,
+ action:"Priority CrowdStrike support case to be raised for the test environment detection gap — specifically why CS EDR did not alert on suspension of its own CSFalconServices.exe process. Production confirmed safe via PPL hardening validation.",
+ next:"Open CrowdStrike priority case for test-env gap. Validate Purview DLP suspension behaviour in a controlled test. Confirm PPL hardening is uniformly applied across all production endpoints.",
+ tools:"EDR-Freeze (C++ PoC), Visual Studio, MinGW g++ Compiler, PPLKiller, CrowdStrike Falcon, CMD (Admin)"},
+
+{id:3,title:"ICMP Tunneling Exfiltration",status:"done",risk:"high",owner:"Shresth Paul",
+ dates:"16 Mar – 25 Mar 2026",sortDate:"2026-03-16",
+ dc:["DC0082","DC0078","DC0044","DC0053","DC0051"],mitre:["T1572","T1048","T1059.001"],
+ hypothesis:"An attacker with user-level access can exfiltrate data over ICMP tunneling without triggering EDR, firewall, or network monitoring — due to ICMP being implicitly trusted and poorly inspected by security controls.",
+ exposure:"All Windows Endpoints, Network Perimeter, Firewall",
+ finding:"CRITICAL: 1 KB file exfiltrated with zero alerts raised. No CrowdStrike detections. No firewall or network monitoring alerts triggered. ICMP traffic blended seamlessly with benign ping traffic. All four firewall operation tests (query, view, add, delete rules) succeeded silently without any security event.",
+ testFinding:null,prodFinding:null,
+ risks:[],impacted:true,
+ action:"Support case opened with CrowdStrike (Case #02399884). Exact reproduction steps provided to CS engineering team. Awaiting investigation response.",
+ next:"Build custom ICMP tunneling detection. Await CrowdStrike case resolution to understand telemetry gaps and implement compensating network-layer controls.",
+ tools:"CrowdStrike Falcon, Python ICMP Server, PowerShell, Network Firewall Logs, Packet Capture"},
+
+{id:4,title:"Cryptojacking Detection",status:"done",risk:"low",owner:"Shresth Paul",
+ dates:"6 Apr – 8 Apr 2026",sortDate:"2026-04-06",
+ dc:[],mitre:["T1496","TA0040"],
+ hypothesis:"Assuming a compromised endpoint, an attacker deploys cryptocurrency mining tools on EZ machines. Validates whether layered security tooling (WDAC, EDR, network proxy) detects or prevents unauthorised mining activity.",
+ exposure:"Windows Endpoints",
+ finding:"All crypto mining tools were blocked across multiple control layers. WDAC blocked installer-based mining software. CrowdStrike blocked CLI mining tools with high-severity alerts. Zscaler blocked several mining payloads at the network layer. Defense-in-depth proved comprehensively effective.",
+ testFinding:null,prodFinding:null,
+ risks:[],impacted:false,
+ action:"No action required. WDAC, CrowdStrike, and Zscaler are operating effectively as layered controls against cryptojacking scenarios.",
+ next:"Periodic re-validation recommended as new mining tools and obfuscation techniques emerge.",
+ tools:"WDAC, CrowdStrike Falcon, Zscaler"},
+
+{id:5,title:"BlueHammer Zero-Day (Privilege Escalation)",status:"done",risk:"high",owner:"Shresth Paul",
+ dates:"13 Apr 2026",sortDate:"2026-04-13",
+ dc:[],mitre:["T1548","T1003.002","T1069"],
+ hypothesis:"A local user with standard privileges exploits a TOCTOU vulnerability (BlueHammer) in Windows Defender's signature update routine using oplocks and directory junctions to coerce the SYSTEM-level Defender service into opening the SAM file for credential hash extraction and privilege escalation.",
+ exposure:"Windows 10 22H2, Windows 11 23H2 Workstations",
+ finding:"Post-exploitation validation detected: whoami.exe executed under NT AUTHORITY\\SYSTEM — consistent with BlueHammer advisory's post-exploitation confirmation step. Risk escalates significantly if the parent process is unknown or subsequent credential access activity is observed.",
+ testFinding:null,prodFinding:null,
+ risks:[],impacted:true,
+ action:"Two CQL alerts deployed in CrowdStrike NG-SIEM: (1) 'System Account Discovery Command (BlueHammer Zero-Day)' and (2) 'Suspicious SAM Database Access' — detects SAM file access by non-SYSTEM accounts aligned to the BlueHammer exploit chain.",
+ next:"Allowlist approved SYSTEM-level parent processes (SCCM, EDR, RMM scanners). Correlate alert with discovery commands (net user, net localgroup). Escalate immediately to IR if triggered on internet-facing or unpatched hosts.",
+ tools:"CrowdStrike NG-SIEM, CQL Detection Language, Windows Event Logs"},
+
+{id:6,title:"OpenClaw C2 Simulation",status:"wip",risk:"info",owner:"Shresth Paul",
+ dates:"10 Apr 2026 – Ongoing",sortDate:"2026-04-10",
+ dc:[],mitre:["TA0011","T1071"],
+ hypothesis:"Using OpenClaw capabilities to simulate a real-world attacker establishing command-and-control access to an EZ test machine, validating C2 detection coverage and endpoint resilience against modern C2 frameworks.",
+ exposure:"Test Environment — Windows Endpoints",
+ finding:"Hunt in progress. Test environment is being configured. Simulation execution and results pending.",
+ testFinding:null,prodFinding:null,
+ risks:[],impacted:null,
+ action:"OpenClaw being installed and configured in test environment.",
+ next:"Complete C2 simulation, document IOCs and behavioural indicators, map detections to existing SIEM coverage, identify gaps.",
+ tools:"OpenClaw, CrowdStrike Falcon"},
+
+{id:7,title:"LucidRook Malware (Lua-based Targeted Attack)",status:"done",risk:"high",owner:"Shresth Paul",
+ dates:"10 Apr 2026",sortDate:"2026-04-10",
+ dc:[],mitre:["T1566.001","T1059","T1036","T1074"],
+ hypothesis:"LucidRook — a Lua-based modular malware reported by Cisco Talos — is delivered via spear-phishing with malicious shortcuts and password-protected archives, staging payloads in hidden directories and leveraging legitimate Windows binaries for execution, reconnaissance, and potential data exfiltration.",
+ exposure:"Windows Endpoints, Email Gateway",
+ finding:"No active compromise evidence found in the EZ environment. Proactive advisory-driven detection implemented as a preventive control. TTP behaviour mapped to known artefacts: Pester execution, Build.bat proxy execution, and .Trashes hidden payload directories. Detection is live and actively monitored by SOC.",
+ testFinding:null,prodFinding:null,
+ risks:[],impacted:false,
+ action:"Live NG-SIEM alert deployed: 'LucidRook Malware (Suspicious Pester Build.bat Proxy Execution)'. SOC monitoring active. Any trigger from this detection is to be treated as a High-Severity Incident requiring immediate endpoint isolation.",
+ next:"If alert triggers: isolate endpoint via EDR immediately, terminate process tree, forensic check for hidden directories and sideloaded DLLs, scope email delivery chain, reset user credentials, escalate to IR if payload execution is confirmed.",
+ tools:"CrowdStrike NG-SIEM, Cisco Talos Advisory, Email Gateway Logs"},
+
+{id:8,title:"Credential Harvesting (DPAPI / Shadow Copy)",status:"wip",risk:"info",owner:"Shresth Paul",
+ dates:"15 Apr 2026 – Ongoing",sortDate:"2026-04-15",
+ dc:[],mitre:["T1003","T1003.004","T1003.002","T1548"],
+ hypothesis:"On a fully updated Windows 11 host with EDR, host firewall, and browser extension blockers — credential hashes may be extractable without executing known-malicious binaries, by abusing DPAPI, Volume Shadow Copies, LOLBins (rundll32, msiexec, odbcconf), or hardware/firmware interfaces (TPM, WMI persistent subscriptions).",
+ exposure:"Windows 11 Endpoints — Fully Hardened Production",
+ finding:"Hunt in progress. Hypothesis actively being validated across multiple living-off-the-land credential extraction technique variants.",
+ testFinding:null,prodFinding:null,
+ risks:[],impacted:null,
+ action:"Active investigation ongoing across multiple LOLBin and DPAPI credential extraction paths.",
+ next:"Complete all technique variants, document detection gaps, create targeted SIEM rules for any undetected extraction paths identified.",
+ tools:"CrowdStrike Falcon, Windows Event Logs, DPAPI, WMI, Volume Shadow Copy"},
+
+{id:9,title:"PPL Bypass / Security Hardening Validation",status:"done",risk:"medium",owner:"Abhinav Tiwari",
+ dates:"2026",sortDate:"2026-01-15",
+ dc:[],mitre:["T1562.001","T1548"],
+ hypothesis:"An adversary with local admin privileges attempts to disable critical security services (CrowdStrike, Microsoft Purview DLP) using PPL bypass utilities to blind SOC visibility, maintain persistence, and enable ransomware deployment or stealthy data exfiltration.",
+ exposure:"Windows Endpoints — Production Environment",
+ finding:"PPL hardening successfully enforced across all tested production endpoints. CrowdStrike Falcon, Purview DLP, and all protected security services remained fully operational. The PPL bypass tool failed to attach to or modify any protected process state. CrowdStrike triggered a high-severity alert on the bypass attempt — confirming effective detection coverage.",
+ testFinding:null,prodFinding:null,
+ risks:[],impacted:false,
+ action:"No action required. OS-level PPL enforcement, CrowdStrike tamper protection, and privilege boundary controls are functioning effectively in defense-in-depth configuration.",
+ next:"Validate alerting consistency on process-access attempts across all endpoint builds. Follow up with BYOVD (Bring Your Own Vulnerable Driver) technique testing as the next escalation path.",
+ tools:"CrowdStrike Falcon, PPLKiller, CMD (Elevated)"},
+
+{id:10,title:"IR Automation — SOC Triage Script",status:"done",risk:"info",owner:"Shresth Paul",
+ dates:"20 Apr – 23 Apr 2026",sortDate:"2026-04-20",
+ dc:[],mitre:["TA0043","T1082","T1069"],
+ hypothesis:"Current IR process requires manual coordination across HD, Endpoint, Infra, and AD teams creating fragmented, slow investigations. A single-execution PowerShell triage script via CrowdStrike RTR can gather all security-relevant host context independently, reducing analyst dependency and mean time to contain.",
+ exposure:"All Windows Endpoints — SOC Operational Process",
+ finding:"Script successfully deployed and validated in CrowdStrike RTR. Collects: identity and privilege context, active console and RDP sessions, system-level and user-level persistence (Run keys, scheduled tasks, WMI event subscriptions, startup items), recent file artefacts from temp and downloads directories, GPO results, and full system information — all rendered in a self-contained HTML report.",
+ testFinding:null,prodFinding:null,
+ risks:[],impacted:false,
+ action:"Script deployed to CrowdStrike RTR library. SOC analysts can now independently perform endpoint triage via single execution, generating a structured HTML report with tabbed navigation across Identity, Sessions, Persistence, Files, GPO, and System views.",
+ next:"Expand triage coverage with additional detection scenarios. Explore integration of HTML report output into SIEM pipeline for automated case enrichment and ticket generation.",
+ tools:"CrowdStrike RTR, PowerShell, HTML Report Engine"},
+
+{id:11,title:"YellowKey BitLocker Bypass",status:"done",risk:"high",owner:"Abhinav Tiwari",
+ dates:"2026",sortDate:"2026-03-01",
+ dc:[],mitre:["T1006","T1486"],
+ hypothesis:"Test whether BitLocker full-disk encryption on EZ office laptops can be bypassed using the YellowKey exploit — targeting the Windows Recovery Environment via a specially crafted external USB drive and malicious FsTx files to spawn an unrestricted command shell.",
+ exposure:"All EZ Office Laptops — Physical Access Scenario",
+ finding:"CRITICAL: Exploit PoC succeeded fully. BitLocker was bypassed. An unrestricted CMD prompt spawned with complete drive and file access without any additional credentials being required. The BitLocker key protecting EZ office laptops was successfully defeated via the YellowKey exploit path.",
+ testFinding:null,prodFinding:null,
+ risks:[],impacted:true,
+ action:"Patching script executed across all production devices. Post-patching validation completed and confirmed. AutoFsTx file removed from offline hive on all endpoints to close the exploit path.",
+ next:"Enable TPM + PIN for BitLocker on all EZ endpoints — pending leadership approval. This control significantly raises the bar for physical access attacks and eliminates the primary YellowKey attack vector.",
+ tools:"External USB Drive, Windows Recovery Environment, YellowKey Exploit PoC"},
+
+{id:12,title:"inetpub Folder Abuse / CVE-2025-21204",status:"done",risk:"low",owner:"Abhinav Tiwari",
+ dates:"30 Apr 2025",sortDate:"2025-04-30",
+ dc:[],mitre:["TA0004","T1548.004"],
+ hypothesis:"The 'inetpub' folder auto-created by the April 2025 Patch Tuesday may allow any unprivileged user to create directory junctions, potentially enabling privilege escalation or denial-of-service for future Windows security updates via CBS_E_SOURCE_MISSING error.",
+ exposure:"Windows Endpoints & Servers — Domain Joined",
+ finding:"Junctions can be created without admin rights on domain-joined devices. Copying files into inetpub requires admin credentials. EZ systems were not affected — all subsequent Microsoft updates installed successfully. The risk is primarily theoretical for environments timely applying future patches.",
+ testFinding:null,prodFinding:null,
+ risks:[],impacted:false,
+ action:"No action required. Systems patched and validated. Monitoring Microsoft advisories for any future guidance on inetpub directory hardening.",
+ next:"Monitor Microsoft guidance for hardening recommendations. No immediate action needed.",
+ tools:"Command Prompt (mklink /j), CrowdStrike EDR"}
+];
+
+/* ════ HELPERS ════ */
+const rC=r=>({high:'h',medium:'m',low:'l',info:'i'})[r]||'i';
+const rP=r=>({high:'rh',medium:'rm',low:'rl',info:'ri'})[r]||'ri';
+const rL=r=>({high:'High Risk',medium:'Medium Risk',low:'Low Risk',info:'Under Review'})[r]||r;
+const impBadge=h=>h.impacted===true?'<span class="rpill rh" style="margin-left:6px">Exposure Confirmed</span>':h.impacted===false?'<span class="rpill rl" style="margin-left:6px">Not Impacted</span>':'';
+
+/* ════ TABS ════ */
+function showTab(name,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false')});
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');btn.setAttribute('aria-selected','true');
+  document.getElementById('panel-'+name).classList.add('active');
+  if(name==='overview'&&!chartsDrawn)drawCharts();
+  if(name==='timeline')drawTimeline();
+  if(name==='mitre')drawMitre();
+}
+
+/* ════ CARDS ════ */
+function renderCards(filter){
+  let list=hunts;
+  if(filter==='high')list=hunts.filter(h=>h.risk==='high');
+  else if(filter==='medium')list=hunts.filter(h=>h.risk==='medium');
+  else if(filter==='low')list=hunts.filter(h=>h.risk==='low'||h.risk==='info');
+  else if(filter==='wip')list=hunts.filter(h=>h.status==='wip');
+  else if(filter==='exposed')list=hunts.filter(h=>h.impacted===true);
+  document.getElementById('card-grid').innerHTML=list.map(h=>`
+    <div class="card ${rC(h.risk)}" onclick="openModal(${h.id})" role="button" tabindex="0"
+         onkeydown="if(event.key==='Enter')openModal(${h.id})">
+      <div class="card-head">
+        <div class="card-meta">
+          <span class="sbadge ${h.status==='done'?'sdone':'swip'}">${h.status==='done'?'Completed':'In Progress'}</span>
+          <span class="rpill ${rP(h.risk)}">${rL(h.risk)}</span>
+        </div>
+        <div class="card-title">${h.title}</div>
+        <div class="card-owner">${h.owner}&nbsp;&middot;&nbsp;${h.dates}</div>
+      </div>
+      <div class="card-body">
+        <div class="slbl">Hypothesis</div>
+        <div class="card-hyp">${h.hypothesis.length>150?h.hypothesis.slice(0,147)+'…':h.hypothesis}</div>
+        ${h.mitre.length?`<div class="slbl">MITRE ATT&CK</div><div class="mtags">${h.mitre.map(m=>`<span class="mtag">${m}</span>`).join('')}</div>`:''}
+        <div class="impact-line">
+          <span style="font-size:14px;flex-shrink:0;margin-top:1px">${h.impacted===true?'⚠️':h.impacted===false?'✅':'🕐'}</span>
+          <span class="impact-txt">${h.impacted===true?'Exposure confirmed in simulation':h.impacted===false?'Controls effective — no production impact':'Assessment in progress'}</span>
+        </div>
+      </div>
+      <div class="card-foot">
+        <span class="cdate">${h.dates}</span>
+        <button class="vbtn">View details →</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterCards(f,btn){
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderCards(f);
+}
+
+/* ════ MODAL ════ */
+function openModal(id){
+  const h=hunts.find(x=>x.id===id);if(!h)return;
+  document.getElementById('modal-title').textContent=h.title;
+  const tp=h.testFinding&&h.prodFinding?`
+    <div class="tp-grid">
+      <div class="tbox tst"><div class="blbl">🧪 Test Environment</div><p>${h.testFinding}</p></div>
+      <div class="tbox prd"><div class="blbl">🛡️ Production Environment</div><p>${h.prodFinding}</p></div>
+    </div>`:'';
+  const rl=h.risks.length?`<div class="dlbl" style="margin:1.25rem 0 6px">Risk Factors Identified</div>
+    <ul class="rlist">${h.risks.map(r=>`<li>${r}</li>`).join('')}</ul><div class="divider"></div>`:'<div class="divider"></div>';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="d-grid">
+      <div><div class="dlbl">Status</div><div class="dval"><span class="sbadge ${h.status==='done'?'sdone':'swip'}">${h.status==='done'?'Completed':'In Progress'}</span>${impBadge(h)}</div></div>
+      <div><div class="dlbl">Risk Level</div><div class="dval"><span class="rpill ${rP(h.risk)}">${rL(h.risk)}</span></div></div>
+      <div><div class="dlbl">Hunt Owner</div><div class="dval">${h.owner}</div></div>
+      <div><div class="dlbl">Timeline</div><div class="dval m">${h.dates}</div></div>
+      <div><div class="dlbl">Exposure Area</div><div class="dval m">${h.exposure}</div></div>
+      <div><div class="dlbl">Tools & Data Sources</div><div class="dval m">${h.tools}</div></div>
+    </div>
+    ${h.mitre.length?`<div class="dlbl">MITRE ATT&CK Mapping</div><div class="mtags" style="margin-bottom:1.25rem">${h.mitre.map(m=>`<span class="mtag">${m}</span>`).join('')}</div>`:''}
+    ${h.dc.length?`<div class="dlbl" style="margin-bottom:5px">Data Components</div><div class="dc-tags">${h.dc.map(d=>`<span class="dctag">${d}</span>`).join('')}</div>`:''}
+    <div class="divider"></div>
+    <div class="dlbl" style="margin-bottom:6px">Hypothesis</div>
+    <p style="font-size:13px;color:var(--t2);line-height:1.8;margin-bottom:1.25rem">${h.hypothesis}</p>
+    <div class="fbox"><div class="blbl">Finding & Observations</div><p>${h.finding}</p></div>
+    ${tp}${rl}
+    <div class="abox"><div class="blbl">Action Taken & Next Steps</div>
+      <p><strong style="color:var(--t1);font-weight:500">Action taken:</strong> ${h.action}</p>
+      <p style="margin-top:8px"><strong style="color:var(--t1);font-weight:500">Next step:</strong> ${h.next}</p>
+    </div>`;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}
+function closeModalOutside(e){if(e.target===document.getElementById('modal'))closeModal();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+/* ════ TIMELINE ════ */
+function drawTimeline(){
+  const sorted=[...hunts].sort((a,b)=>a.sortDate.localeCompare(b.sortDate));
+  document.getElementById('tl-container').innerHTML=sorted.map(h=>`
+    <div class="tl-item">
+      <div class="tl-dot ${rC(h.risk)}"></div>
+      <div class="tl-date">${h.dates}</div>
+      <div class="tl-title">${h.title}</div>
+      <div class="tl-meta">
+        <span>${h.owner}</span>
+        <span class="rpill ${rP(h.risk)}" style="font-size:9px;padding:2px 6px">${rL(h.risk)}</span>
+        <span class="sbadge ${h.status==='done'?'sdone':'swip'}" style="font-size:9px">${h.status==='done'?'Completed':'In Progress'}</span>
+      </div>
+      <div class="tl-desc">${h.hypothesis.length>200?h.hypothesis.slice(0,197)+'…':h.hypothesis}</div>
+    </div>`).join('');
+}
+
+/* ════ CHARTS ════ */
+let chartsDrawn=false;
+const RED='#C8102E',AMBER='#c47b10',GREEN='#2a5c10',BLUE='#185FA5';
+const RA='rgba(200,16,46,.15)',AA='rgba(196,123,16,.15)',GA='rgba(42,92,16,.15)',BA='rgba(24,95,165,.15)';
+const baseOpts={responsive:true,maintainAspectRatio:true,
+  plugins:{legend:{labels:{font:{family:"'Inter',sans-serif",size:11},color:'#4e4d4a',padding:14}},
+    tooltip:{titleFont:{family:"'Inter',sans-serif"},bodyFont:{family:"'Inter',sans-serif"},padding:10}}};
+
+function drawCharts(){
+  chartsDrawn=true;
+  /* Doughnut: Risk */
+  new Chart(document.getElementById('cRisk'),{type:'doughnut',
+    data:{labels:['High Risk','Medium Risk','Low Risk','Under Review'],
+      datasets:[{data:[4,2,2,4],backgroundColor:[RED,AMBER,GREEN,BLUE],borderWidth:0,hoverOffset:8}]},
+    options:{...baseOpts,cutout:'62%',plugins:{...baseOpts.plugins,legend:{position:'bottom',labels:{...baseOpts.plugins.legend.labels,padding:18}}}}});
+  /* Doughnut: Status */
+  new Chart(document.getElementById('cStatus'),{type:'doughnut',
+    data:{labels:['Completed','In Progress'],
+      datasets:[{data:[9,3],backgroundColor:[GREEN,AMBER],borderWidth:0,hoverOffset:8}]},
+    options:{...baseOpts,cutout:'62%',plugins:{...baseOpts.plugins,legend:{position:'bottom',labels:{...baseOpts.plugins.legend.labels,padding:18}}}}});
+  /* Doughnut: Impact */
+  new Chart(document.getElementById('cImpact'),{type:'doughnut',
+    data:{labels:['Exposure Confirmed','Not Impacted','In Progress'],
+      datasets:[{data:[3,6,3],backgroundColor:[RED,GREEN,AMBER],borderWidth:0,hoverOffset:8}]},
+    options:{...baseOpts,cutout:'62%',plugins:{...baseOpts.plugins,legend:{position:'bottom',labels:{...baseOpts.plugins.legend.labels,padding:18}}}}});
+  /* Bar: Detection Actions */
+  new Chart(document.getElementById('cDetection'),{type:'bar',
+    data:{labels:['SIEM Rules','Patch Applied','CS Case Opened','No Action Needed','WIP'],
+      datasets:[{data:[5,1,2,3,3],backgroundColor:[RED,AMBER,BLUE,GREEN,AMBER],borderWidth:0,borderRadius:3}]},
+    options:{...baseOpts,scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:"'Inter',sans-serif",size:11},color:'#8a8880'},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{family:"'Inter',sans-serif",size:10},color:'#8a8880'},grid:{display:false}}},plugins:{...baseOpts.plugins,legend:{display:false}}}});
+  /* Bar: Timeline */
+  new Chart(document.getElementById('cTimeline'),{type:'bar',
+    data:{
+      labels:['CVE-2025-21204\nApr 2025','EDR-Freeze\nSep 2025','Sched. Jobs\nFeb 2026','ICMP Tunnel\nMar 2026','YellowKey\nMar 2026','Cryptojacking\nApr 2026','BlueHammer\nApr 2026','OpenClaw\nApr 2026','LucidRook\nApr 2026','Cred. Harvest\nApr 2026','PPL Bypass\n2026','IR Automation\nApr 2026'],
+      datasets:[
+        {label:'High Risk',data:[0,1,0,1,1,0,1,0,1,0,0,0],backgroundColor:RED,borderWidth:0,borderRadius:3},
+        {label:'Medium Risk',data:[0,0,1,0,0,0,0,0,0,0,1,0],backgroundColor:AMBER,borderWidth:0,borderRadius:3},
+        {label:'Low Risk',data:[1,0,0,0,0,1,0,0,0,0,0,0],backgroundColor:GREEN,borderWidth:0,borderRadius:3},
+        {label:'Under Review',data:[0,0,0,0,0,0,0,1,0,1,0,1],backgroundColor:BLUE,borderWidth:0,borderRadius:3}]},
+    options:{...baseOpts,scales:{y:{stacked:true,display:false,grid:{display:false}},x:{stacked:true,ticks:{font:{family:"'Inter',sans-serif",size:9},color:'#8a8880',maxRotation:40},grid:{display:false}}},plugins:{...baseOpts.plugins,legend:{position:'bottom',labels:{...baseOpts.plugins.legend.labels,padding:18}}}}});
+  /* Bar H: Exposure Areas */
+  new Chart(document.getElementById('cArea'),{type:'bar',
+    data:{labels:['Windows Endpoints','Network / Firewall','Email Gateway','Physical / Laptops','SOC Operations','Cloud / Identity'],
+      datasets:[{label:'Hunts',data:[10,3,2,1,1,1],backgroundColor:[RA,AA,BA,AA,GA,BA],borderColor:[RED,AMBER,BLUE,AMBER,GREEN,BLUE],borderWidth:1.5,borderRadius:3}]},
+    options:{...baseOpts,indexAxis:'y',scales:{x:{beginAtZero:true,ticks:{stepSize:1,font:{family:"'Inter',sans-serif",size:11},color:'#8a8880'},grid:{color:'rgba(0,0,0,0.05)'}},y:{ticks:{font:{family:"'Inter',sans-serif",size:11},color:'#4e4d4a'},grid:{display:false}}},plugins:{...baseOpts.plugins,legend:{display:false}}}});
+  /* Bar: Owner */
+  new Chart(document.getElementById('cOwner'),{type:'bar',
+    data:{labels:['Shresth Paul','Abhinav Tiwari'],
+      datasets:[{data:[8,4],backgroundColor:[RED,BLUE],borderWidth:0,borderRadius:3}]},
+    options:{...baseOpts,scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:"'Inter',sans-serif",size:11},color:'#8a8880'},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{family:"'Inter',sans-serif",size:13},color:'#4e4d4a'},grid:{display:false}}},plugins:{...baseOpts.plugins,legend:{display:false}}}});
+}
+
+/* ════ MITRE PANEL ════ */
+let mitreDone=false;
+function drawMitre(){
+  if(mitreDone)return;mitreDone=true;
+  const freq={};
+  hunts.forEach(h=>h.mitre.forEach(t=>{freq[t]=(freq[t]||0)+1;}));
+  const labels=Object.keys(freq).sort((a,b)=>freq[b]-freq[a]);
+  const data=labels.map(l=>freq[l]);
+  const colors=labels.map(l=>{
+    if(l.startsWith('TA'))return BLUE;
+    const n=parseInt(l.replace(/T(\d+).*/,'$1'));
+    if(n>=1560&&n<=1570)return RED;
+    if(n>=1540&&n<=1555)return RED;
+    if(n>=1000&&n<=1100)return AMBER;
+    return GREEN;
+  });
+  new Chart(document.getElementById('cMitre'),{type:'bar',
+    data:{labels,datasets:[{label:'Hunt Count',data,backgroundColor:colors,borderWidth:0,borderRadius:3}]},
+    options:{...baseOpts,indexAxis:'y',
+      scales:{x:{beginAtZero:true,ticks:{stepSize:1,font:{family:"'Inter',sans-serif",size:11},color:'#8a8880'},grid:{color:'rgba(0,0,0,0.05)'}},
+        y:{ticks:{font:{family:"'Inter',monospace",size:11},color:'#4e4d4a'},grid:{display:false}}},
+      plugins:{...baseOpts.plugins,legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw} hunt${c.raw>1?'s':''}`}}}}});
+
+  const rows=hunts.flatMap(h=>h.mitre.map(t=>({t,hunt:h.title,risk:h.risk,owner:h.owner,status:h.status})));
+  document.getElementById('mitre-table').innerHTML=`<table>
+    <thead><tr>
+      <th>Technique / Tactic</th><th>Hunt Activity</th><th>Risk</th><th>Status</th><th>Owner</th>
+    </tr></thead>
+    <tbody>${rows.map((r,i)=>`<tr>
+      <td><span class="mtag">${r.t}</span></td>
+      <td>${r.hunt}</td>
+      <td><span class="rpill ${rP(r.risk)}">${rL(r.risk)}</span></td>
+      <td><span class="sbadge ${r.status==='done'?'sdone':'swip'}">${r.status==='done'?'Completed':'In Progress'}</span></td>
+      <td style="color:var(--t3)">${r.owner}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+/* INIT */
+renderCards('all');
+drawCharts();
+</script>
+</body>
+</html>
