@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -17,7 +17,7 @@
   --sans:'Inter',system-ui,sans-serif;
 }
 body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100vh}
-
+ 
 /* HEADER */
 .hdr{background:#fff;border-bottom:2.5px solid var(--red);padding:0 2.5rem;height:68px;
   display:flex;align-items:center;justify-content:space-between;
@@ -28,13 +28,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
 .hdr-dept{font-size:11px;color:var(--red);letter-spacing:0.09em;text-transform:uppercase;font-weight:500;white-space:nowrap}
 .hdr-right{font-size:11px;color:var(--t3);letter-spacing:.03em;text-align:right;line-height:1.6}
 .hdr-right strong{display:block;color:var(--t1);font-weight:500;font-size:12px}
-
+ 
 /* HERO */
 .hero{background:var(--dark);padding:3rem 2.5rem 2.5rem;border-bottom:3px solid var(--red)}
 .hero-eye{font-size:10.5px;color:var(--red);text-transform:uppercase;letter-spacing:0.13em;margin-bottom:.65rem;font-weight:500}
 .hero-title{font-size:32px;font-weight:300;color:#fff;line-height:1.2;max-width:620px;margin-bottom:.85rem;letter-spacing:-.01em}
 .hero-sub{font-size:13.5px;color:#6f6f6f;max-width:600px;line-height:1.75}
-
+ 
 /* KPI BAR */
 .kpi-bar{background:#fff;border-bottom:.5px solid var(--border);padding:1.35rem 2.5rem;
   display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:0}
@@ -43,7 +43,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
 .kpi-n{font-size:32px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.02em}
 .kpi-n.r{color:var(--red)}.kpi-n.a{color:#92600a}.kpi-n.g{color:#2a5c10}
 .kpi-l{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-top:6px}
-
+ 
 /* TABS */
 .tab-bar{background:#fff;border-bottom:.5px solid var(--border);padding:0 2.5rem;
   display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:68px;z-index:90}
@@ -53,16 +53,16 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
   border-bottom:2.5px solid transparent;margin-bottom:-0.5px;transition:all .15s;font-weight:400}
 .tab-btn:hover{color:var(--t1)}
 .tab-btn.active{color:var(--red);border-bottom-color:var(--red);font-weight:500}
-
+ 
 /* PANELS */
 .panel{display:none;padding:2rem 2.5rem 3rem;animation:fadeIn .2s ease}
 .panel.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-
+ 
 /* SECTION */
 .sec-title{font-size:20px;font-weight:300;color:var(--t1);margin-bottom:.25rem;letter-spacing:-.01em}
 .sec-sub{font-size:12.5px;color:var(--t3);margin-bottom:1.75rem;line-height:1.6}
-
+ 
 /* STAT STRIP */
 .stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:1rem;margin-bottom:1.75rem}
 .stat-tile{background:#fff;border:.5px solid var(--border);border-radius:2px;padding:1.1rem 1.25rem;
@@ -72,7 +72,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
 .stat-icon{font-size:24px;line-height:1;flex-shrink:0}
 .stat-val{font-size:24px;font-weight:300;line-height:1;letter-spacing:-.01em}
 .stat-lbl{font-size:10.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
-
+ 
 /* CHARTS GRID */
 .charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem;margin-bottom:1.75rem}
 .chart-card{background:#fff;border:.5px solid var(--border);border-radius:2px;padding:1.35rem}
@@ -82,7 +82,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
 .chart-sub{font-size:11.5px;color:var(--t3);margin-bottom:1.1rem}
 .chart-wrap canvas{max-height:230px}
 .chart-wrap.tall canvas{max-height:290px}
-
+ 
 /* FILTER */
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1.35rem}
 .filter-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-right:4px}
@@ -90,10 +90,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
   background:transparent;color:var(--t2);cursor:pointer;border-radius:2px;
   transition:all .15s;font-family:var(--sans)}
 .fbtn:hover,.fbtn.active{background:var(--red);border-color:var(--red);color:#fff}
-
+ 
 /* HUNT GRID */
 .hunt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1rem}
-
+ 
 /* CARD */
 .card{background:#fff;border:.5px solid var(--border);border-top:3px solid var(--border);
   border-radius:2px;display:flex;flex-direction:column;cursor:pointer;
@@ -122,7 +122,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
 .cdate{font-size:11px;color:var(--t3)}
 .vbtn{font-size:11px;color:var(--red);border:none;background:none;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:3px}
 .vbtn:hover{text-decoration:underline}
-
+ 
 /* TIMELINE */
 .timeline{position:relative;padding-left:1.75rem;max-width:760px}
 .timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--red),var(--border2))}
@@ -133,7 +133,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
 .tl-title{font-size:14px;font-weight:500;color:var(--t1);margin-bottom:3px}
 .tl-meta{font-size:11px;color:var(--t3);margin-bottom:5px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .tl-desc{font-size:12.5px;color:var(--t2);line-height:1.65}
-
+ 
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;
   overflow-y:auto;padding:2rem 1rem;align-items:flex-start;justify-content:center}
@@ -171,7 +171,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
 .abox p{font-size:12.5px;color:var(--t2);line-height:1.75}
 .dc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1.25rem}
 .dctag{font-size:10px;padding:2px 7px;background:var(--bg2);border:.5px solid var(--border2);color:var(--t2);border-radius:2px;font-family:'Courier New',monospace}
-
+ 
 /* MITRE TABLE */
 .mitre-table-wrap{background:#fff;border:.5px solid var(--border);border-radius:2px;overflow:hidden;overflow-x:auto}
 .mitre-table-wrap table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
@@ -179,12 +179,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
 .mitre-table-wrap td{padding:.65rem 1.25rem;border-bottom:.5px solid rgba(0,0,0,.055);color:var(--t2)}
 .mitre-table-wrap tr:last-child td{border-bottom:none}
 .mitre-table-wrap tr:nth-child(even) td{background:#fafaf9}
-
+ 
 /* FOOTER */
 .footer{background:var(--dark);padding:1.5rem 2.5rem;text-align:center;border-top:2px solid var(--red)}
 .footer p{font-size:11px;color:#444;letter-spacing:.03em}
 .footer strong{color:#666;font-weight:500}
-
+ 
 /* RESPONSIVE */
 @media(max-width:768px){
   .hdr{padding:.875rem 1.25rem;height:auto}.tab-bar{padding:0 1rem;top:0;position:relative}
@@ -198,7 +198,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
 </style>
 </head>
 <body>
-
+ 
 <!-- HEADER with real EZ logo -->
 <header class="hdr">
   <div class="hdr-left">
@@ -214,14 +214,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
     Confidential &nbsp;&middot;&nbsp; June 2026
   </div>
 </header>
-
+ 
 <!-- HERO -->
 <div class="hero">
   <div class="hero-eye">SOC Threat Hunting Program</div>
   <div class="hero-title">Proactive Security Assurance Dashboard</div>
   <div class="hero-sub">A structured record of adversarial simulations, hypothesis-driven threat hunts, and detection engineering conducted by the EZ SOC team — covering endpoint, identity, network, and physical security domains.</div>
 </div>
-
+ 
 <!-- KPI BAR -->
 <div class="kpi-bar">
   <div class="kpi"><div class="kpi-n">12</div><div class="kpi-l">Total Hunts</div></div>
@@ -232,7 +232,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
   <div class="kpi"><div class="kpi-n">2</div><div class="kpi-l">Open CS Cases</div></div>
   <div class="kpi"><div class="kpi-n" style="font-size:13px;line-height:1.65;padding-top:5px">Shresth<br>Abhinav</div><div class="kpi-l">Lead Hunters</div></div>
 </div>
-
+ 
 <!-- TAB BAR -->
 <nav class="tab-bar" role="tablist" aria-label="Dashboard sections">
   <button class="tab-btn active" onclick="showTab('overview',this)" role="tab" aria-selected="true">Overview &amp; Analytics</button>
@@ -240,12 +240,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
   <button class="tab-btn" onclick="showTab('timeline',this)" role="tab" aria-selected="false">Timeline</button>
   <button class="tab-btn" onclick="showTab('mitre',this)" role="tab" aria-selected="false">MITRE ATT&amp;CK Coverage</button>
 </nav>
-
+ 
 <!-- ══ PANEL: OVERVIEW ══ -->
 <div id="panel-overview" class="panel active">
   <div class="sec-title">Security Posture at a Glance</div>
   <div class="sec-sub">Aggregated metrics and visual analytics across all threat hunting activities conducted by the EZ SOC team.</div>
-
+ 
   <div class="stat-strip">
     <div class="stat-tile red">
       <div class="stat-icon">⚠️</div>
@@ -264,7 +264,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
       <div><div class="stat-val" style="color:#185FA5">2</div><div class="stat-lbl">Open CS Support Cases</div></div>
     </div>
   </div>
-
+ 
   <div class="charts-grid">
     <div class="chart-card">
       <div class="chart-title">Risk Distribution</div>
@@ -303,7 +303,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
     </div>
   </div>
 </div>
-
+ 
 <!-- ══ PANEL: HUNTS ══ -->
 <div id="panel-hunts" class="panel">
   <div class="sec-title">All Threat Hunt Activities</div>
@@ -319,14 +319,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
   </div>
   <div class="hunt-grid" id="card-grid"></div>
 </div>
-
+ 
 <!-- ══ PANEL: TIMELINE ══ -->
 <div id="panel-timeline" class="panel">
   <div class="sec-title">Chronological Hunt Timeline</div>
   <div class="sec-sub">All threat hunting activities ordered from earliest to most recent.</div>
   <div class="timeline" id="tl-container"></div>
 </div>
-
+ 
 <!-- ══ PANEL: MITRE ══ -->
 <div id="panel-mitre" class="panel">
   <div class="sec-title">MITRE ATT&amp;CK Coverage Map</div>
@@ -340,7 +340,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
   </div>
   <div class="mitre-table-wrap" id="mitre-table"></div>
 </div>
-
+ 
 <!-- MODAL -->
 <div class="overlay" id="modal" onclick="closeModalOutside(event)">
   <div class="modal" id="modal-inner">
@@ -351,12 +351,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100
     <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
-
+ 
 <!-- FOOTER -->
 <footer class="footer">
   <p><strong>Egon Zehnder &mdash; Security Operations Center</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Threat Hunting Dashboard&nbsp;&nbsp;|&nbsp;&nbsp;Confidential &amp; Internal Use Only&nbsp;&nbsp;|&nbsp;&nbsp;2025–2026</p>
 </footer>
-
+ 
 <script>
 /* ════════════════════════════════
    DATA
@@ -373,7 +373,7 @@ const hunts=[
  action:"Created multiple NG-SIEM rules. LOLBin Execution & Modification rule updated. Fine-tuning ongoing to reduce alert fatigue while retaining detection fidelity.",
  next:"Fine-tune existing rules and build additional detections around scheduled task abuse patterns.",
  tools:"CrowdStrike NG-SIEM"},
-
+ 
 {id:2,title:"EDR-Freeze (EDR Suspension Attack)",status:"done",risk:"high",owner:"Abhinav Tiwari",
  dates:"25 Sep 2025 (Test) · 26 Sep 2025 (Prod)",sortDate:"2025-09-25",
  dc:[],mitre:["T1562.001","T1548","TA0005"],
@@ -393,7 +393,7 @@ const hunts=[
  action:"Priority CrowdStrike support case to be raised for the test environment detection gap — specifically why CS EDR did not alert on suspension of its own CSFalconServices.exe process. Production confirmed safe via PPL hardening validation.",
  next:"Open CrowdStrike priority case for test-env gap. Validate Purview DLP suspension behaviour in a controlled test. Confirm PPL hardening is uniformly applied across all production endpoints.",
  tools:"EDR-Freeze (C++ PoC), Visual Studio, MinGW g++ Compiler, PPLKiller, CrowdStrike Falcon, CMD (Admin)"},
-
+ 
 {id:3,title:"ICMP Tunneling Exfiltration",status:"done",risk:"high",owner:"Shresth Paul",
  dates:"16 Mar – 25 Mar 2026",sortDate:"2026-03-16",
  dc:["DC0082","DC0078","DC0044","DC0053","DC0051"],mitre:["T1572","T1048","T1059.001"],
@@ -405,7 +405,7 @@ const hunts=[
  action:"Support case opened with CrowdStrike (Case #02399884). Exact reproduction steps provided to CS engineering team. Awaiting investigation response.",
  next:"Build custom ICMP tunneling detection. Await CrowdStrike case resolution to understand telemetry gaps and implement compensating network-layer controls.",
  tools:"CrowdStrike Falcon, Python ICMP Server, PowerShell, Network Firewall Logs, Packet Capture"},
-
+ 
 {id:4,title:"Cryptojacking Detection",status:"done",risk:"low",owner:"Shresth Paul",
  dates:"6 Apr – 8 Apr 2026",sortDate:"2026-04-06",
  dc:[],mitre:["T1496","TA0040"],
@@ -417,7 +417,7 @@ const hunts=[
  action:"No action required. WDAC, CrowdStrike, and Zscaler are operating effectively as layered controls against cryptojacking scenarios.",
  next:"Periodic re-validation recommended as new mining tools and obfuscation techniques emerge.",
  tools:"WDAC, CrowdStrike Falcon, Zscaler"},
-
+ 
 {id:5,title:"BlueHammer Zero-Day (Privilege Escalation)",status:"done",risk:"high",owner:"Shresth Paul",
  dates:"13 Apr 2026",sortDate:"2026-04-13",
  dc:[],mitre:["T1548","T1003.002","T1069"],
@@ -429,7 +429,7 @@ const hunts=[
  action:"Two CQL alerts deployed in CrowdStrike NG-SIEM: (1) 'System Account Discovery Command (BlueHammer Zero-Day)' and (2) 'Suspicious SAM Database Access' — detects SAM file access by non-SYSTEM accounts aligned to the BlueHammer exploit chain.",
  next:"Allowlist approved SYSTEM-level parent processes (SCCM, EDR, RMM scanners). Correlate alert with discovery commands (net user, net localgroup). Escalate immediately to IR if triggered on internet-facing or unpatched hosts.",
  tools:"CrowdStrike NG-SIEM, CQL Detection Language, Windows Event Logs"},
-
+ 
 {id:6,title:"OpenClaw C2 Simulation",status:"wip",risk:"info",owner:"Shresth Paul",
  dates:"10 Apr 2026 – Ongoing",sortDate:"2026-04-10",
  dc:[],mitre:["TA0011","T1071"],
@@ -441,7 +441,7 @@ const hunts=[
  action:"OpenClaw being installed and configured in test environment.",
  next:"Complete C2 simulation, document IOCs and behavioural indicators, map detections to existing SIEM coverage, identify gaps.",
  tools:"OpenClaw, CrowdStrike Falcon"},
-
+ 
 {id:7,title:"LucidRook Malware (Lua-based Targeted Attack)",status:"done",risk:"high",owner:"Shresth Paul",
  dates:"10 Apr 2026",sortDate:"2026-04-10",
  dc:[],mitre:["T1566.001","T1059","T1036","T1074"],
@@ -453,7 +453,7 @@ const hunts=[
  action:"Live NG-SIEM alert deployed: 'LucidRook Malware (Suspicious Pester Build.bat Proxy Execution)'. SOC monitoring active. Any trigger from this detection is to be treated as a High-Severity Incident requiring immediate endpoint isolation.",
  next:"If alert triggers: isolate endpoint via EDR immediately, terminate process tree, forensic check for hidden directories and sideloaded DLLs, scope email delivery chain, reset user credentials, escalate to IR if payload execution is confirmed.",
  tools:"CrowdStrike NG-SIEM, Cisco Talos Advisory, Email Gateway Logs"},
-
+ 
 {id:8,title:"Credential Harvesting (DPAPI / Shadow Copy)",status:"wip",risk:"info",owner:"Shresth Paul",
  dates:"15 Apr 2026 – Ongoing",sortDate:"2026-04-15",
  dc:[],mitre:["T1003","T1003.004","T1003.002","T1548"],
@@ -465,7 +465,7 @@ const hunts=[
  action:"Active investigation ongoing across multiple LOLBin and DPAPI credential extraction paths.",
  next:"Complete all technique variants, document detection gaps, create targeted SIEM rules for any undetected extraction paths identified.",
  tools:"CrowdStrike Falcon, Windows Event Logs, DPAPI, WMI, Volume Shadow Copy"},
-
+ 
 {id:9,title:"PPL Bypass / Security Hardening Validation",status:"done",risk:"medium",owner:"Abhinav Tiwari",
  dates:"2026",sortDate:"2026-01-15",
  dc:[],mitre:["T1562.001","T1548"],
@@ -477,7 +477,7 @@ const hunts=[
  action:"No action required. OS-level PPL enforcement, CrowdStrike tamper protection, and privilege boundary controls are functioning effectively in defense-in-depth configuration.",
  next:"Validate alerting consistency on process-access attempts across all endpoint builds. Follow up with BYOVD (Bring Your Own Vulnerable Driver) technique testing as the next escalation path.",
  tools:"CrowdStrike Falcon, PPLKiller, CMD (Elevated)"},
-
+ 
 {id:10,title:"IR Automation — SOC Triage Script",status:"done",risk:"info",owner:"Shresth Paul",
  dates:"20 Apr – 23 Apr 2026",sortDate:"2026-04-20",
  dc:[],mitre:["TA0043","T1082","T1069"],
@@ -489,7 +489,7 @@ const hunts=[
  action:"Script deployed to CrowdStrike RTR library. SOC analysts can now independently perform endpoint triage via single execution, generating a structured HTML report with tabbed navigation across Identity, Sessions, Persistence, Files, GPO, and System views.",
  next:"Expand triage coverage with additional detection scenarios. Explore integration of HTML report output into SIEM pipeline for automated case enrichment and ticket generation.",
  tools:"CrowdStrike RTR, PowerShell, HTML Report Engine"},
-
+ 
 {id:11,title:"YellowKey BitLocker Bypass",status:"done",risk:"high",owner:"Abhinav Tiwari",
  dates:"2026",sortDate:"2026-03-01",
  dc:[],mitre:["T1006","T1486"],
@@ -501,7 +501,7 @@ const hunts=[
  action:"Patching script executed across all production devices. Post-patching validation completed and confirmed. AutoFsTx file removed from offline hive on all endpoints to close the exploit path.",
  next:"Enable TPM + PIN for BitLocker on all EZ endpoints — pending leadership approval. This control significantly raises the bar for physical access attacks and eliminates the primary YellowKey attack vector.",
  tools:"External USB Drive, Windows Recovery Environment, YellowKey Exploit PoC"},
-
+ 
 {id:12,title:"inetpub Folder Abuse / CVE-2025-21204",status:"done",risk:"low",owner:"Abhinav Tiwari",
  dates:"30 Apr 2025",sortDate:"2025-04-30",
  dc:[],mitre:["TA0004","T1548.004"],
@@ -514,13 +514,13 @@ const hunts=[
  next:"Monitor Microsoft guidance for hardening recommendations. No immediate action needed.",
  tools:"Command Prompt (mklink /j), CrowdStrike EDR"}
 ];
-
+ 
 /* ════ HELPERS ════ */
 const rC=r=>({high:'h',medium:'m',low:'l',info:'i'})[r]||'i';
 const rP=r=>({high:'rh',medium:'rm',low:'rl',info:'ri'})[r]||'ri';
 const rL=r=>({high:'High Risk',medium:'Medium Risk',low:'Low Risk',info:'Under Review'})[r]||r;
 const impBadge=h=>h.impacted===true?'<span class="rpill rh" style="margin-left:6px">Exposure Confirmed</span>':h.impacted===false?'<span class="rpill rl" style="margin-left:6px">Not Impacted</span>':'';
-
+ 
 /* ════ TABS ════ */
 function showTab(name,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false')});
@@ -531,7 +531,7 @@ function showTab(name,btn){
   if(name==='timeline')drawTimeline();
   if(name==='mitre')drawMitre();
 }
-
+ 
 /* ════ CARDS ════ */
 function renderCards(filter){
   let list=hunts;
@@ -566,12 +566,12 @@ function renderCards(filter){
       </div>
     </div>`).join('');
 }
-
+ 
 function filterCards(f,btn){
   document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');renderCards(f);
 }
-
+ 
 /* ════ MODAL ════ */
 function openModal(id){
   const h=hunts.find(x=>x.id===id);if(!h)return;
@@ -609,7 +609,7 @@ function openModal(id){
 function closeModal(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}
 function closeModalOutside(e){if(e.target===document.getElementById('modal'))closeModal();}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-
+ 
 /* ════ TIMELINE ════ */
 function drawTimeline(){
   const sorted=[...hunts].sort((a,b)=>a.sortDate.localeCompare(b.sortDate));
@@ -626,7 +626,7 @@ function drawTimeline(){
       <div class="tl-desc">${h.hypothesis.length>200?h.hypothesis.slice(0,197)+'…':h.hypothesis}</div>
     </div>`).join('');
 }
-
+ 
 /* ════ CHARTS ════ */
 let chartsDrawn=false;
 const RED='#C8102E',AMBER='#c47b10',GREEN='#2a5c10',BLUE='#185FA5';
@@ -634,7 +634,7 @@ const RA='rgba(200,16,46,.15)',AA='rgba(196,123,16,.15)',GA='rgba(42,92,16,.15)'
 const baseOpts={responsive:true,maintainAspectRatio:true,
   plugins:{legend:{labels:{font:{family:"'Inter',sans-serif",size:11},color:'#4e4d4a',padding:14}},
     tooltip:{titleFont:{family:"'Inter',sans-serif"},bodyFont:{family:"'Inter',sans-serif"},padding:10}}};
-
+ 
 function drawCharts(){
   chartsDrawn=true;
   /* Doughnut: Risk */
@@ -678,7 +678,7 @@ function drawCharts(){
       datasets:[{data:[8,4],backgroundColor:[RED,BLUE],borderWidth:0,borderRadius:3}]},
     options:{...baseOpts,scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:"'Inter',sans-serif",size:11},color:'#8a8880'},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{family:"'Inter',sans-serif",size:13},color:'#4e4d4a'},grid:{display:false}}},plugins:{...baseOpts.plugins,legend:{display:false}}}});
 }
-
+ 
 /* ════ MITRE PANEL ════ */
 let mitreDone=false;
 function drawMitre(){
@@ -701,7 +701,7 @@ function drawMitre(){
       scales:{x:{beginAtZero:true,ticks:{stepSize:1,font:{family:"'Inter',sans-serif",size:11},color:'#8a8880'},grid:{color:'rgba(0,0,0,0.05)'}},
         y:{ticks:{font:{family:"'Inter',monospace",size:11},color:'#4e4d4a'},grid:{display:false}}},
       plugins:{...baseOpts.plugins,legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw} hunt${c.raw>1?'s':''}`}}}}});
-
+ 
   const rows=hunts.flatMap(h=>h.mitre.map(t=>({t,hunt:h.title,risk:h.risk,owner:h.owner,status:h.status})));
   document.getElementById('mitre-table').innerHTML=`<table>
     <thead><tr>
@@ -715,7 +715,7 @@ function drawMitre(){
       <td style="color:var(--t3)">${r.owner}</td>
     </tr>`).join('')}</tbody></table>`;
 }
-
+ 
 /* INIT */
 renderCards('all');
 drawCharts();
